@@ -47,6 +47,7 @@ const translations = {
     formTitle: "입주 신청 정보 입력",
     labels: {
       name: "NAME (이름)",
+      nickname: "NICKNAME (별명)",
       visa: "비자 종류",
       industry: "업종",
       phone: "전화번호",
@@ -55,6 +56,7 @@ const translations = {
     },
     placeholders: {
       name: "이름을 입력하세요",
+      nickname: "별명을 입력하세요",
       visa: "예: E-9, F-2 등",
       industry: "현재 종사 중인 업종",
       phone: "숫자만 입력 (01012345678)",
@@ -67,7 +69,7 @@ const translations = {
     error: "제출 중 오류가 발생했습니다.",
     validation: {
       phone: "전화번호를 정확하게 입력하세요.",
-      fb: "Facebook ID를 다시 확인하세요."
+      //fb: "Facebook ID를 다시 확인하세요."
     }
   },
   en: {
@@ -108,6 +110,7 @@ const translations = {
     formTitle: "Application Information",
     labels: {
       name: "NAME",
+      nickname: "NICKNAME",
       visa: "Visa Type",
       industry: "Industry",
       phone: "Phone Number",
@@ -116,6 +119,7 @@ const translations = {
     },
     placeholders: {
       name: "Enter your name",
+      nickname: "Enter your nickname",
       visa: "e.g., E-9, F-2",
       industry: "Current job category",
       phone: "Numbers only",
@@ -169,6 +173,7 @@ const translations = {
     formTitle: "आवेदन फारम",
     labels: {
       name: "नाम (NAME)",
+      nickname: "उपनाम (NICKNAME)",
       visa: "भिसा प्रकार",
       industry: "कामको प्रकार",
       phone: "फोन नम्बर",
@@ -177,6 +182,7 @@ const translations = {
     },
     placeholders: {
       name: "आफ्नो नाम लेख्नुहोस्",
+      nickname: "आफ्नो उपनाम लेख्नुहोस्",
       visa: "उदा: E-9, F-2",
       industry: "हाल गरिरहेको काम",
       phone: "नम्बर मात्र (उदा: 010...)",
@@ -202,6 +208,7 @@ export default function App() {
 
   const [formData, setFormData] = useState({
     name: "",
+    nickname: "",
     visaType: "",
     industry: "",
     phone: "",
@@ -237,7 +244,7 @@ export default function App() {
     try {
       // Mock API call
       await axios.post("/api/send-email", {
-        subject: `[Shelter Apply] ${formData.name}`,
+        subject: `[네팔 쉘터 입주 동의] ${formData.name}`,
         content: JSON.stringify(formData, null, 2),
       });
       setSubmitStatus("success");
@@ -337,12 +344,13 @@ export default function App() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {[
-                { id: "name", label: t.labels.name, ph: t.placeholders.name, type: "text" },
-                { id: "visaType", label: t.labels.visa, ph: t.placeholders.visa, type: "text" },
-                { id: "industry", label: t.labels.industry, ph: t.placeholders.industry, type: "text" },
-                { id: "phone", label: t.labels.phone, ph: t.placeholders.phone, type: "tel" },
-                { id: "moveInDate", label: t.labels.date, ph: "", type: "date" },
-                { id: "facebookId", label: t.labels.fb, ph: t.placeholders.fb, type: "text" },
+                { id: "전체 성명(Full-name)", label: t.labels.name, ph: t.placeholders.name, type: "text" },
+                { id: "성명(Nick-name)", label: t.labels.nickname, ph: t.placeholders.name, type: "text" },
+                { id: "비자종류(visaType)", label: t.labels.visa, ph: t.placeholders.visa, type: "text" },
+                { id: "업종(industry)", label: t.labels.industry, ph: t.placeholders.industry, type: "text" },
+                { id: "전화번호(phone)", label: t.labels.phone, ph: t.placeholders.phone, type: "tel" },
+                { id: "입주일(moveInDate)", label: t.labels.date, ph: "", type: "date" },
+                { id: "facebook-Id", label: t.labels.fb, ph: t.placeholders.fb, type: "text" },
               ].map((field) => (
                 <div key={field.id} className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
