@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-//2026.04.17-1
 // --- 번역 데이터 데이터베이스 ---
 const translations = {
   ko: {
@@ -53,15 +52,15 @@ const translations = {
       industry: "업종",
       phone: "전화번호",
       date: "입주일자",
-      fb: "Facebook ID (Optional)"
+      fb: "Facebook ID"
     },
     placeholders: {
       name: "이름을 입력하세요",
       nickname: "별명을 입력하세요",
       visa: "예: E-9, F-2 등",
       industry: "현재 종사 중인 업종",
-      phone: "010-1234-5678",
-      fb: "Facebook ID (선택 사항)"
+      phone: "숫자만 입력 (01012345678)",
+      fb: "Facebook ID를 입력하세요"
     },
     submit: "제출하기",
     submitting: "제출 중...",
@@ -70,6 +69,7 @@ const translations = {
     error: "제출 중 오류가 발생했습니다.",
     validation: {
       phone: "전화번호를 정확하게 입력하세요.",
+      //fb: "Facebook ID를 다시 확인하세요."
     }
   },
   en: {
@@ -115,15 +115,15 @@ const translations = {
       industry: "Industry",
       phone: "Phone Number",
       date: "Move-in Date",
-      fb: "Facebook ID (Optional)"
+      fb: "Facebook ID"
     },
     placeholders: {
       name: "Enter your name",
       nickname: "Enter your nickname",
       visa: "e.g., E-9, F-2",
       industry: "Current job category",
-      phone: "010-1234-5678",
-      fb: "Enter Facebook ID (Optional)"
+      phone: "Numbers only",
+      fb: "Enter your Facebook ID"
     },
     submit: "Submit Application",
     submitting: "Submitting...",
@@ -132,6 +132,7 @@ const translations = {
     error: "An error occurred during submission.",
     validation: {
       phone: "Please enter a valid phone number.",
+      fb: "Please check your Facebook ID."
     }
   },
   ne: {
@@ -141,14 +142,14 @@ const translations = {
     qrClose: "QR कोड बन्द गर्नुहोस्",
     qrDesc: "यो QR कोड स्क्यान गरेर सिधै आवेदन पृष्ठमा जानुहोस्।",
     agreementTitle: "सम्झौताका शर्तहरू",
-    agreementIntro: "म गुन्पो नेपाली सेल्터मा बस्नका लागि निम्न नियमहरू पालना गर्न सहमत छु।",
+    agreementIntro: "म गुन्पो नेपाली सेल्टरमा बस्नका लागि निम्न नियमहरू पालना गर्न सहमत छु।",
     rules: [
       {
         h: "१. अवधि र शुल्क",
         l: [
           "बसाई अवधि अधिकतम ३ महिना, विशेष अवस्थामा थप्न सकिनेछ।",
           "प्रवेश शुल्क एक पटकको ५०,००० वोन (KB बैंक ५२९४०२-०१-१७३२९९)।",
-          "लामो समय बस्दा हरेक महिना의 १ तारिखमा ५०,००० वोन बुझाउनुपर्नेछ।"
+          "लामो समय बस्दा हरेक महिनाको १ तारिखमा ५०,००० वोन बुझाउनुपर्नेछ।"
         ]
       },
       {
@@ -156,7 +157,7 @@ const translations = {
         l: [
           "सेल्टरको क्षति भएमा मर्मत खर्च बेहोर्नुपर्नेछ।",
           "झोला (लगेज) मा नाम र फोन नम्बर सहितको ट्याग हुनुपर्छ।",
-          "सेल्टर छोडेको ३ महिनासम्म सामान नलगेमा डिस्पোজ गरिनेछ।"
+          "सेल्टर छोडेको ३ महिनासम्म सामान नलगेमा डिस्पोज गरिनेछ।"
         ]
       },
       {
@@ -177,15 +178,15 @@ const translations = {
       industry: "कामको प्रकार",
       phone: "फोन नम्बर",
       date: "प्रवेश मिति",
-      fb: "फेसबुक ID (Optional)"
+      fb: "फेसबुक ID"
     },
     placeholders: {
       name: "आफ्नो नाम लेख्नुहोस्",
       nickname: "आफ्नो उपनाम लेख्नुहोस्",
       visa: "उदा: E-9, F-2",
       industry: "हाल गरिरहेको काम",
-      phone: "010-1234-5678",
-      fb: "फेसबुक ID लेख्नुहोस् (Optional)"
+      phone: "नम्बर मात्र (उदा: 010...)",
+      fb: "आफ्नो फेसबुक ID लेख्नुहोस्"
     },
     submit: "बुझाउनुहोस्",
     submitting: "बुझाउँदै...",
@@ -194,6 +195,7 @@ const translations = {
     error: "बुझाउने क्रममा त्रुटि भयो।",
     validation: {
       phone: "कृपया सही फोन नम्बर राख्नुहोस्।",
+      fb: "कृपया फेसबुक ID जाँच गर्नुहोस्।"
     }
   }
 };
@@ -204,7 +206,6 @@ export default function App() {
   const [lang, setLang] = useState<LangType>("ko");
   const t = translations[lang];
 
-  // 1. formData의 key값들을 깔끔하게 정리 (input의 name과 일치시킴)
   const [formData, setFormData] = useState({
     name: "",
     nickname: "",
@@ -220,20 +221,10 @@ export default function App() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [showQR, setShowQR] = useState(false);
 
-  // 3. 전화번호 자동 하이픈 포맷팅 함수
-  const formatPhoneNumber = (value: string) => {
-    const numbers = value.replace(/[^\d]/g, "");
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
     if (name === "phone") {
-      // 3. 화면에 010-1234-5678 형식으로 표시
-      setFormData((prev) => ({ ...prev, [name]: formatPhoneNumber(value) }));
+      setFormData((prev) => ({ ...prev, [name]: value.replace(/\D/g, "") }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -242,25 +233,22 @@ export default function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus("idle");
     setErrors({});
     
-    // 3. 제출 시에도 하이픈이 포함된 데이터가 전송되도록 유효성 검사 (최소 12자: 010-123-4567 이상)
-    if (formData.phone.length < 12) {
+    if (formData.phone.length < 10) {
       setErrors({ phone: t.validation.phone });
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // 1. 실제 API 호출 주소 확인 (Vercel 등에 배포된 주소)
+      // Mock API call
       await axios.post("/api/send-email", {
         subject: `[네팔 쉘터 입주 동의] ${formData.name}`,
         content: JSON.stringify(formData, null, 2),
       });
       setSubmitStatus("success");
     } catch (err) {
-      console.error("Submit Error:", err);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -356,14 +344,13 @@ export default function App() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {[
-                { id: "name", label: t.labels.name, ph: t.placeholders.name, type: "text", required: true },
-                { id: "nickname", label: t.labels.nickname, ph: t.placeholders.name, type: "text", required: true },
-                { id: "visaType", label: t.labels.visa, ph: t.placeholders.visa, type: "text", required: true },
-                { id: "industry", label: t.labels.industry, ph: t.placeholders.industry, type: "text", required: true },
-                { id: "phone", label: t.labels.phone, ph: t.placeholders.phone, type: "tel", required: true },
-                { id: "moveInDate", label: t.labels.date, ph: "", type: "date", required: true },
-                // 2. Facebook ID는 required: false (Optional 처리)
-                { id: "facebookId", label: t.labels.fb, ph: t.placeholders.fb, type: "text", required: false },
+                { id: "전체 성명(Full-name)", label: t.labels.name, ph: t.placeholders.name, type: "text" },
+                { id: "성명(Nick-name)", label: t.labels.nickname, ph: t.placeholders.name, type: "text" },
+                { id: "비자종류(visaType)", label: t.labels.visa, ph: t.placeholders.visa, type: "text" },
+                { id: "업종(industry)", label: t.labels.industry, ph: t.placeholders.industry, type: "text" },
+                { id: "전화번호(phone)", label: t.labels.phone, ph: t.placeholders.phone, type: "tel" },
+                { id: "입주일(moveInDate)", label: t.labels.date, ph: "", type: "date" },
+                { id: "facebook-Id", label: t.labels.fb, ph: t.placeholders.fb, type: "text" },
               ].map((field) => (
                 <div key={field.id} className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
@@ -372,7 +359,7 @@ export default function App() {
                   <input
                     type={field.type}
                     name={field.id}
-                    required={field.required}
+                    required
                     value={(formData as any)[field.id]}
                     onChange={handleChange}
                     placeholder={field.ph}
